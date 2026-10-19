@@ -16,3 +16,12 @@ describe.each(LANGS)('course %s', (lang) => {
     expect(c.phrases.length).toBeGreaterThanOrEqual(3)
   })
 })
+
+describe('Tagalog audio clips', () => {
+  it('has a recorded clip for every Tagalog word and phrase', async () => {
+    const { course } = await import('./tl')
+    const clips: Record<string, string> = (await import('./tl-audio.json')).default
+    const missing = [...course.items, ...course.phrases].filter((x) => !clips[x.target]).map((x) => x.id)
+    expect(missing).toEqual([])
+  })
+})

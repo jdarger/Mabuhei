@@ -1,4 +1,10 @@
 import { useEffect, useState } from 'react'
+import tlAudio from './content/tl-audio.json'
+
+/** Pre-recorded clips by language tag, keyed by the exact target text. Used before the device voice. */
+const clips: Record<string, Record<string, string>> = { 'fil-PH': tlAudio }
+const hasClips = (ttsLang: string) => !!clips[ttsLang]
+let playing: HTMLAudioElement | null = null
 
 const synth: SpeechSynthesis | null = typeof window !== 'undefined' && 'speechSynthesis' in window ? window.speechSynthesis : null
 
@@ -25,8 +31,9 @@ function currentVoice(ttsLang: string) {
 
 /** True when a matching voice exists. Voices load asynchronously, so this updates when they arrive. */
 export function useHasVoice(ttsLang: string): boolean {
-  const [has, setHas] = useState(() => !!currentVoice(ttsLang))
+  const [has, setHas] = useState(() => hasClips(ttsLang) || !!currentVoice(ttsLang))
   useEffect(() => {
+    if (hasClips(ttsLang)) return setHas(true)
     if (!synth) return
     const update = () => setHas(!!currentVoice(ttsLang))
     update()
@@ -37,6 +44,17 @@ export function useHasVoice(ttsLang: string): boolean {
 }
 
 export function speak(text: string, ttsLang: string): void {
+  const clip = clips[ttsLang]?.[text]
+  if (clip) {
+    try {
+      playing?.pause()
+      playing = new Audio(clip)
+      void playing.play().catch(() => {})
+      return
+    } catch {
+      /* fall back to the device voice */
+    }
+  }
   if (!synth) return
   const voice = currentVoice(ttsLang)
   if (!voice) return
