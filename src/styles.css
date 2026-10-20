@@ -664,3 +664,62 @@ input:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 2px;
 }
+
+/* ---------- hints ---------- */
+.hint-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+.hint-row .btn {
+  width: auto;
+  flex: none;
+}
+.hint-btn {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  color: var(--yellow-text);
+  background: var(--yellow-soft);
+}
+.hint-btn:disabled {
+  opacity: 0.5;
+}
+.hint-box {
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  text-align: center;
+}
+.hint-pattern {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px 1.4em;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.hint-word {
+  white-space: nowrap;
+}
+.hint-text {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+.hint-note {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.hint-used {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+.option.struck,
+.option.struck:disabled {
+  text-decoration: line-through;
+  opacity: 0.4;
+  color: var(--muted);
+}
