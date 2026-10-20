@@ -5,6 +5,7 @@ import { checkAnswer } from '../lesson/check'
 import type { Result } from '../srs/fsrs'
 import { speak } from '../speech'
 import { playCorrect, playWrong } from '../sound'
+import Keyboard from './Keyboard'
 
 interface Props {
   course: Course
@@ -14,8 +15,6 @@ interface Props {
   onAnswer: (r: Result) => void
   onNext: () => void
 }
-
-const SPECIAL: Record<string, string[]> = { no: ['æ', 'ø', 'å'], tl: ['ñ'] }
 
 const PROMPTS = {
   meaning: 'What does this mean?',
@@ -35,7 +34,10 @@ export default function ExerciseView({ course, exercise, hasVoice, sound, onAnsw
   // Auto-play audio for exercises that show/hear the target.
   useEffect(() => {
     if (kind === 'meaning' || kind === 'listen') speak(item.target, course.ttsLang)
-    if (kind === 'type') inputRef.current?.focus()
+    // inputMode="none" keeps the system keyboard away; focus just shows the caret.
+    // Skip it on touch screens so iOS never flashes its own keyboard.
+    const touch = window.matchMedia?.('(pointer: coarse)').matches
+    if (kind === 'type' && !touch) inputRef.current?.focus({ preventScroll: true })
   }, [kind, item.target, course.ttsLang])
 
   const finish = (r: Result) => {
@@ -108,6 +110,8 @@ export default function ExerciseView({ course, exercise, hasVoice, sound, onAnsw
               value={typed}
               disabled={!!result}
               placeholder={`Type in ${course.name}`}
+              inputMode="none"
+              enterKeyHint="done"
               autoCapitalize="none"
               autoCorrect="off"
               autoComplete="off"
@@ -122,21 +126,9 @@ export default function ExerciseView({ course, exercise, hasVoice, sound, onAnsw
               }}
             />
             {!result && (
-              <div className="chars">
-                {(SPECIAL[course.lang] ?? []).map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className="char"
-                    onClick={() => {
-                      setTyped((t) => t + c)
-                      inputRef.current?.focus()
-                    }}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
+              <button type="button" className="btn btn-ghost idk" onClick={() => finish('wrong')}>
+                I don&apos;t know
+              </button>
             )}
           </div>
         )}
@@ -144,16 +136,21 @@ export default function ExerciseView({ course, exercise, hasVoice, sound, onAnsw
 
       <footer className={`feedback ${result ? (result === 'wrong' ? 'bad' : result === 'almost' ? 'meh' : 'good') : ''}`}>
         {!result ? (
-          <div className="footer-row">
-            {kind === 'type' && (
-              <button className="btn btn-ghost" onClick={() => finish('wrong')}>
-                I don&apos;t know
+          kind === 'type' ? (
+            <Keyboard
+              lang={course.lang}
+              canCheck={canCheck}
+              onKey={(c) => setTyped((t) => t + c)}
+              onBackspace={() => setTyped((t) => t.slice(0, -1))}
+              onCheck={check}
+            />
+          ) : (
+            <div className="footer-row">
+              <button className="btn btn-primary" disabled={!canCheck} onClick={check}>
+                Check
               </button>
-            )}
-            <button className="btn btn-primary" disabled={!canCheck} onClick={check}>
-              Check
-            </button>
-          </div>
+            </div>
+          )
         ) : (
           <>
             <div className="feedback-msg" role="status">
