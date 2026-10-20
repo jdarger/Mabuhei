@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import noAudio from './content/no-audio.json'
 import tlAudio from './content/tl-audio.json'
 
 /** Pre-recorded clips by language tag, keyed by the exact target text. Used before the device voice. */
-const clips: Record<string, Record<string, string>> = { 'fil-PH': tlAudio }
+const clips: Record<string, Record<string, string>> = { 'nb-NO': noAudio, 'fil-PH': tlAudio }
 const hasClips = (ttsLang: string) => !!clips[ttsLang]
 let playing: HTMLAudioElement | null = null
 

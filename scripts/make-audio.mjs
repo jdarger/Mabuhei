@@ -4,7 +4,10 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 
-const VOICES = { tl: { model: 'elevenlabs/eleven-multilingual-v2', voice: 'nPczCjzI2devNBz1zQrb' } }
+const VOICES = {
+  tl: { model: 'elevenlabs/eleven-multilingual-v2', voice: 'nPczCjzI2devNBz1zQrb' },
+  no: { model: 'elevenlabs/eleven-multilingual-v2', voice: 'nPczCjzI2devNBz1zQrb' },
+}
 
 const lang = process.argv[2]
 const cfg = VOICES[lang]
